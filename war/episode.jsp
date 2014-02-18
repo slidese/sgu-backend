@@ -15,6 +15,7 @@
 
 <!-- Custom styles for this template -->
 <link href="css/jumbotron-narrow.css" rel="stylesheet">
+<link href="css/sgu.css" rel="stylesheet">
 
 </head>
 
@@ -63,7 +64,7 @@
 
 		</div>
 
-		<form role="form">
+		<form role="form" action="/save" method="post">
 			<div class="form-group">
 				<label for="InputId">Episode #</label> <input type="text"
 					class="form-control" id="InputId" placeholder="The episode ID" />
@@ -135,7 +136,7 @@
 
 			<div class="alert alert-info">
 				<h4>Hints</h4>
-				When adding links to either Science or fiction or the Sections
+				When adding links to either "Science or fiction" or "Sections"
 				please note:
 				<ol>
 					<li>To add multiple links to an item separate each link with a
@@ -146,10 +147,12 @@
 
 			<!-- Science or fiction -->
 			<label>Science or fiction</label>
-			<table class="table table-striped">
+			<table class="table table-striped" id="scienceOrFictionTable">
 				<thead>
 					<tr>
 						<th></th>
+						<th></th>
+						<th>#</th>
 						<th>Science?</th>
 						<th>Description</th>
 						<th>Links</th>
@@ -159,6 +162,8 @@
 				</thead>
 				<tbody>
 					<tr>
+						<td></td>
+						<td></td>
 						<td>1</td>
 						<td><input type="checkbox"></td>
 						<td></td>
@@ -171,7 +176,7 @@
 			</table>
 
 			<div class="clearfix">
-				<a class="pull-right" href="#" id="addSofLink">Add science or
+				<a class="pull-right" href="#" id="addScienceOrFictionLink">Add science or
 					fiction item</a>
 			</div>
 
@@ -183,6 +188,7 @@
 				<thead>
 					<tr>
 						<th></th>
+						<th></th>
 						<th>Title</th>
 						<th>Start</th>
 						<th>Link</th>
@@ -191,7 +197,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					
+
 				</tbody>
 			</table>
 
@@ -224,9 +230,29 @@
 	<!-- script src="js/jquery.1.10.2.min.js"></script-->
 	<script src="js/bootstrap.min.js"></script>
 	<script src="js/jquery.tablednd.js"></script>
+	<script src="js/jquery.jeditable.js"></script>
 
 	<script type="text/javascript">
 	
+		$("#addScienceOrFictionLink").click(function() {
+		    addScienceOrFictionRow("1", true, "Change this description", "", "");
+		    resetEditables();
+            resetTableDnD();
+			return false;
+		});
+	
+		$("#addSection").click(function() {
+		    addSectionRow("", "Change this title", "0:00", "", "");
+		    resetEditables();
+            resetTableDnD();
+			return false;
+		});
+		
+		$(document).on("click", "a.deleteRow", function() {
+		   deleteRow(this);
+		   return false;
+		});
+		
         $("#fetchButton").click(function() {
             
             var btn = $(this);
@@ -271,7 +297,9 @@
                 //alert( "finished" );
                 //if ($("#InputId").val().length > 0)
                 btn.button("reset");
-                $("#sectionsTable").tableDnD();
+                //$("#sectionsTable").tableDnD();
+                resetEditables();
+                resetTableDnD();
             });
             
             return false;
@@ -281,14 +309,68 @@
         function addSectionRow(number, title, start, link, tags) {
             // <tr style=\"display: none;\"><td><span class=\"triggeredit\">Name</span></td><td><span class=\"triggeredit\">Value</span></td><td><a href=\"#\" class=\"removeProperty\"><span class=\"glyphicon glyphicon-trash pull-right\"></span></a></td></tr>")
             $("<tr style=\"display: none;\"> \
+            		<td class=\"dragHandle\"><span class=\"glyphicon glyphicon-move\"></span></td> \
 					<td><a href=\"#\"><span class=\"glyphicon glyphicon-edit\"></span></a></td> \
-					<td>" + title + "</td> \
-					<td>" + start + "</td> \
+					<td><span class=\"edit-textarea\">" + title + "</span></td> \
+					<td><span class=\"edit\">" + start + "</span></td> \
 					<td><a href=\"" + link + "\"><span class=\"glyphicon glyphicon-link\"></span></a></td> \
 					<td><a href=\"" + tags + "\"><span class=\"glyphicon glyphicon-tags\"></span></a></td> \
-					<td align=\"right\"><a href=\"#\">Remove</a></td> \
+					<td align=\"right\"><a href=\"#\" class=\"deleteRow\">Remove</a></td> \
 					</tr>")
             .appendTo('#sectionsTable > tbody').fadeIn(200);
+        }
+        
+        function addScienceOrFictionRow(number, science, description, link, tags) {
+            $("<tr style=\"display: none;\"> \
+            		<td class=\"dragHandle\"><span class=\"glyphicon glyphicon-move\"></span></td> \
+					<td><a href=\"#\"><span class=\"glyphicon glyphicon-edit\"></span></a></td> \
+					<td>" + number + "</td> \
+					<td>" + science + "</td> \
+					<td>" + description + "</td> \
+					<td><a href=\"" + link + "\"><span class=\"glyphicon glyphicon-link\"></span></a></td> \
+					<td><a href=\"" + tags + "\"><span class=\"glyphicon glyphicon-tags\"></span></a></td> \
+					<td align=\"right\"><a href=\"#\" class=\"deleteRow\">Remove</a></td> \
+					</tr>")
+            .appendTo('#scienceOrFictionTable > tbody').fadeIn(200);
+        }
+        
+        function deleteRow(row) {
+            $(row).parent().parent().remove();
+        }
+        
+        // Make sure we have version 0.7 or later for this to function
+        function resetTableDnD() {
+            $("#sectionsTable").tableDnD({
+            	dragHandle: ".dragHandle"  
+            });
+        }
+        
+        function resetEditables() {
+            $(".edit").editable(function(value, settings) { 
+    			console.log(this);
+    			console.log(value);
+    			console.log(settings);
+    			return(value);
+    		},
+    		{ 
+    		    height    :  "24px",
+    		    width     :  "60px",
+    		    cssclass  :  "editable-input"
+    		});
+            
+            $(".edit-textarea").editable(function(value, settings) { 
+    			console.log(this);
+    			console.log(value);
+    			console.log(settings);
+    			return(value);
+    		},
+    		{ 
+    		    type      :  "textarea",
+    		    submit    :  "OK",
+    		    height    :  "40px",
+    		    width     :  "600px",
+    		    cssclass  :  "editable-input"
+    		});
         }
     </script>
 
