@@ -151,8 +151,7 @@
 				<thead>
 					<tr>
 						<th></th>
-						<th></th>
-						<th>#</th>
+						<th width="80">#</th>
 						<th>Science?</th>
 						<th>Description</th>
 						<th>Links</th>
@@ -161,17 +160,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-						<td></td>
-						<td></td>
-						<td>1</td>
-						<td><input type="checkbox"></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td align="right"><span class="glyphicon glyphicon-trash"></span>
-							<a href="#">Remove</a></td>
-					</tr>
+					
 				</tbody>
 			</table>
 
@@ -187,7 +176,6 @@
 			<table class="table table-striped" id="sectionsTable">
 				<thead>
 					<tr>
-						<th></th>
 						<th></th>
 						<th>Title</th>
 						<th>Start</th>
@@ -286,6 +274,11 @@
                     addSectionRow("", $(this).find("title").text(), "0:00", $(this).find("link").text(), "");
                 });
                 
+                $(data).find("episode > scienceorfiction > item").each(function() {
+                    //alert($(this).find("title").text());
+                    addScienceOrFictionRow($(this).find("title").text(), true, $(this).find("description").text(), $(this).find("link").text(), "");
+                });
+                
                 //alert(status.text());
                 
             }).fail(function(msg) {
@@ -310,7 +303,6 @@
             // <tr style=\"display: none;\"><td><span class=\"triggeredit\">Name</span></td><td><span class=\"triggeredit\">Value</span></td><td><a href=\"#\" class=\"removeProperty\"><span class=\"glyphicon glyphicon-trash pull-right\"></span></a></td></tr>")
             $("<tr style=\"display: none;\"> \
             		<td class=\"dragHandle\"><span class=\"glyphicon glyphicon-move\"></span></td> \
-					<td><a href=\"#\"><span class=\"glyphicon glyphicon-edit\"></span></a></td> \
 					<td><span class=\"edit-textarea\">" + title + "</span></td> \
 					<td><span class=\"edit\">" + start + "</span></td> \
 					<td><a href=\"" + link + "\"><span class=\"glyphicon glyphicon-link\"></span></a></td> \
@@ -323,10 +315,9 @@
         function addScienceOrFictionRow(number, science, description, link, tags) {
             $("<tr style=\"display: none;\"> \
             		<td class=\"dragHandle\"><span class=\"glyphicon glyphicon-move\"></span></td> \
-					<td><a href=\"#\"><span class=\"glyphicon glyphicon-edit\"></span></a></td> \
-					<td>" + number + "</td> \
+					<td><span class=\"edit\">" + number + "</span></td> \
 					<td>" + science + "</td> \
-					<td>" + description + "</td> \
+					<td><span class=\"edit-textarea\">" + description + "</span></td> \
 					<td><a href=\"" + link + "\"><span class=\"glyphicon glyphicon-link\"></span></a></td> \
 					<td><a href=\"" + tags + "\"><span class=\"glyphicon glyphicon-tags\"></span></a></td> \
 					<td align=\"right\"><a href=\"#\" class=\"deleteRow\">Remove</a></td> \
@@ -341,6 +332,10 @@
         // Make sure we have version 0.7 or later for this to function
         function resetTableDnD() {
             $("#sectionsTable").tableDnD({
+            	dragHandle: ".dragHandle"  
+            });
+            
+            $("#scienceOrFictionTable").tableDnD({
             	dragHandle: ".dragHandle"  
             });
         }
